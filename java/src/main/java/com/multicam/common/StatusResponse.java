@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.List;
 import java.util.ArrayList;
+import com.multicam.common.UploadTypes.UploadItem;
 
 /**
  * Status response from a MultiCam device.
