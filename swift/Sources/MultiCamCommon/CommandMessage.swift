@@ -16,21 +16,51 @@ public struct CommandMessage: Codable {
     /// File name (required for GET_VIDEO and UPLOAD_TO_CLOUD commands)
     public let fileName: String?
 
-    /// Presigned S3 URL for upload (required for UPLOAD_TO_CLOUD command)
+    /// Presigned S3 URL for upload (required for UPLOAD_TO_CLOUD command with presigned URL auth)
     public let uploadUrl: String?
+
+    /// S3 bucket name (required for UPLOAD_TO_CLOUD command with IAM credentials auth)
+    public let s3Bucket: String?
+
+    /// S3 object key/path (required for UPLOAD_TO_CLOUD command with IAM credentials auth)
+    public let s3Key: String?
+
+    /// AWS access key ID from STS (required for UPLOAD_TO_CLOUD command with IAM credentials auth)
+    public let awsAccessKeyId: String?
+
+    /// AWS secret access key from STS (required for UPLOAD_TO_CLOUD command with IAM credentials auth)
+    public let awsSecretAccessKey: String?
+
+    /// AWS session token from STS (required for UPLOAD_TO_CLOUD command with IAM credentials auth)
+    public let awsSessionToken: String?
+
+    /// AWS region (required for UPLOAD_TO_CLOUD command with IAM credentials auth)
+    public let awsRegion: String?
 
     public init(
         command: CommandType,
         timestamp: TimeInterval,
         deviceId: String = "controller",
         fileName: String? = nil,
-        uploadUrl: String? = nil
+        uploadUrl: String? = nil,
+        s3Bucket: String? = nil,
+        s3Key: String? = nil,
+        awsAccessKeyId: String? = nil,
+        awsSecretAccessKey: String? = nil,
+        awsSessionToken: String? = nil,
+        awsRegion: String? = nil
     ) {
         self.command = command
         self.timestamp = timestamp
         self.deviceId = deviceId
         self.fileName = fileName
         self.uploadUrl = uploadUrl
+        self.s3Bucket = s3Bucket
+        self.s3Key = s3Key
+        self.awsAccessKeyId = awsAccessKeyId
+        self.awsSecretAccessKey = awsSecretAccessKey
+        self.awsSessionToken = awsSessionToken
+        self.awsRegion = awsRegion
     }
 
     // MARK: - Factory Methods
@@ -131,6 +161,45 @@ public struct CommandMessage: Codable {
             deviceId: deviceId,
             fileName: fileName,
             uploadUrl: uploadUrl
+        )
+    }
+
+    /// Create an UPLOAD_TO_CLOUD command with IAM credentials authentication
+    ///
+    /// Uploads the specified file to cloud storage using AWS IAM credentials from STS AssumeRole.
+    /// File will be automatically deleted from device after successful upload.
+    /// - Parameters:
+    ///   - fileName: File name to upload
+    ///   - s3Bucket: S3 bucket name
+    ///   - s3Key: S3 object key/path
+    ///   - awsAccessKeyId: AWS access key ID from STS
+    ///   - awsSecretAccessKey: AWS secret access key from STS
+    ///   - awsSessionToken: AWS session token from STS
+    ///   - awsRegion: AWS region (e.g., "us-east-1")
+    ///   - deviceId: ID of the sending device
+    /// - Returns: CommandMessage instance
+    public static func uploadToCloudWithIAM(
+        fileName: String,
+        s3Bucket: String,
+        s3Key: String,
+        awsAccessKeyId: String,
+        awsSecretAccessKey: String,
+        awsSessionToken: String,
+        awsRegion: String,
+        deviceId: String = "controller"
+    ) -> CommandMessage {
+        return CommandMessage(
+            command: .uploadToCloud,
+            timestamp: Date().timeIntervalSince1970,
+            deviceId: deviceId,
+            fileName: fileName,
+            uploadUrl: nil,
+            s3Bucket: s3Bucket,
+            s3Key: s3Key,
+            awsAccessKeyId: awsAccessKeyId,
+            awsSecretAccessKey: awsSecretAccessKey,
+            awsSessionToken: awsSessionToken,
+            awsRegion: awsRegion
         )
     }
 

@@ -375,7 +375,7 @@ Health check ping to verify device connectivity.
 
 ### UPLOAD_TO_CLOUD
 
-Upload video file to cloud storage using a presigned S3 URL.
+Upload video file to cloud storage using either a presigned S3 URL or AWS IAM credentials.
 
 **Behavior:**
 - File is added to device upload queue
@@ -384,7 +384,23 @@ Upload video file to cloud storage using a presigned S3 URL.
 - File is automatically deleted from device after successful upload
 - Returns immediately with queue status
 
-**Request:**
+**Authentication Methods:**
+
+The command supports two authentication methods:
+
+1. **Presigned S3 URL** (original method)
+   - Controller generates time-limited presigned URL
+   - Device uses standard HTTP PUT request
+   - No AWS SDK required on device
+   - URL expires after configured time (typically 1 hour)
+
+2. **IAM Credentials** (new method)
+   - Controller provides temporary AWS credentials via STS AssumeRole
+   - Device uses AWS SDK for upload with retry and progress tracking
+   - Supports larger files and multipart uploads
+   - Credentials can be scoped with IAM policies
+
+**Request (Presigned URL):**
 ```json
 {
   "command": "UPLOAD_TO_CLOUD",
@@ -395,9 +411,37 @@ Upload video file to cloud storage using a presigned S3 URL.
 }
 ```
 
+**Request (IAM Credentials):**
+```json
+{
+  "command": "UPLOAD_TO_CLOUD",
+  "timestamp": 1729000000.123,
+  "deviceId": "controller",
+  "fileName": "video_1729000000.mp4",
+  "s3Bucket": "my-bucket",
+  "s3Key": "2025-01-15/session_123/video_1729000000.mp4",
+  "awsAccessKeyId": "ASIAXXXXXXXXXXX",
+  "awsSecretAccessKey": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "awsSessionToken": "FwoGZXIvYXdzEBYaD...",
+  "awsRegion": "us-east-1"
+}
+```
+
 **Fields:**
 - `fileName` (string, required): File name to upload
-- `uploadUrl` (string, required): Presigned S3 URL with full signature
+
+**Fields for Presigned URL Authentication:**
+- `uploadUrl` (string, required for presigned URL method): Presigned S3 URL with full signature
+
+**Fields for IAM Credentials Authentication:**
+- `s3Bucket` (string, required for IAM method): S3 bucket name
+- `s3Key` (string, required for IAM method): S3 object key (path within bucket)
+- `awsAccessKeyId` (string, required for IAM method): AWS access key ID from STS
+- `awsSecretAccessKey` (string, required for IAM method): AWS secret access key from STS
+- `awsSessionToken` (string, required for IAM method): AWS session token from STS
+- `awsRegion` (string, required for IAM method): AWS region (e.g., "us-east-1")
+
+**Note:** The device detects the authentication method based on which fields are present. If `uploadUrl` is provided, presigned URL method is used. If IAM credential fields are provided, IAM method is used.
 
 **Response (Success):**
 ```json

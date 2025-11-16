@@ -37,8 +37,8 @@ public struct UploadItem: Codable {
     /// Upload status (queued, uploading, completed, failed)
     public let status: String
 
-    /// Presigned S3 URL for upload
-    public let uploadUrl: String
+    /// Presigned S3 URL for upload (only present when using presigned URL auth)
+    public let uploadUrl: String?
 
     /// Error message if upload failed
     public let error: String?
@@ -50,7 +50,7 @@ public struct UploadItem: Codable {
         uploadProgress: Double,
         uploadSpeed: Int64,
         status: String,
-        uploadUrl: String,
+        uploadUrl: String? = nil,
         error: String? = nil
     ) {
         self.fileName = fileName

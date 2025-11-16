@@ -71,7 +71,7 @@ public class UploadTypes {
         /** Upload status (queued, uploading, completed, failed) */
         public String status;
 
-        /** Presigned S3 URL for upload */
+        /** Presigned S3 URL for upload (only present when using presigned URL auth) */
         public String uploadUrl;
 
         /** Error message if upload failed */

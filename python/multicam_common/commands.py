@@ -57,7 +57,25 @@ class CommandMessage:
     """File name (required for GET_VIDEO and UPLOAD_TO_CLOUD commands)"""
 
     uploadUrl: Optional[str] = None
-    """Presigned S3 URL for upload (required for UPLOAD_TO_CLOUD command)"""
+    """Presigned S3 URL for upload (required for UPLOAD_TO_CLOUD command with presigned URL auth)"""
+
+    s3Bucket: Optional[str] = None
+    """S3 bucket name (required for UPLOAD_TO_CLOUD command with IAM credentials auth)"""
+
+    s3Key: Optional[str] = None
+    """S3 object key/path (required for UPLOAD_TO_CLOUD command with IAM credentials auth)"""
+
+    awsAccessKeyId: Optional[str] = None
+    """AWS access key ID from STS (required for UPLOAD_TO_CLOUD command with IAM credentials auth)"""
+
+    awsSecretAccessKey: Optional[str] = None
+    """AWS secret access key from STS (required for UPLOAD_TO_CLOUD command with IAM credentials auth)"""
+
+    awsSessionToken: Optional[str] = None
+    """AWS session token from STS (required for UPLOAD_TO_CLOUD command with IAM credentials auth)"""
+
+    awsRegion: Optional[str] = None
+    """AWS region (required for UPLOAD_TO_CLOUD command with IAM credentials auth)"""
 
     def to_json(self) -> str:
         """
@@ -72,6 +90,12 @@ class CommandMessage:
             "deviceId": self.deviceId,
             "fileName": self.fileName,
             "uploadUrl": self.uploadUrl,
+            "s3Bucket": self.s3Bucket,
+            "s3Key": self.s3Key,
+            "awsAccessKeyId": self.awsAccessKeyId,
+            "awsSecretAccessKey": self.awsSecretAccessKey,
+            "awsSessionToken": self.awsSessionToken,
+            "awsRegion": self.awsRegion,
         }
         return json.dumps(data)
 
@@ -102,6 +126,12 @@ class CommandMessage:
             deviceId=data.get('deviceId', 'controller'),
             fileName=data.get('fileName'),
             uploadUrl=data.get('uploadUrl'),
+            s3Bucket=data.get('s3Bucket'),
+            s3Key=data.get('s3Key'),
+            awsAccessKeyId=data.get('awsAccessKeyId'),
+            awsSecretAccessKey=data.get('awsSecretAccessKey'),
+            awsSessionToken=data.get('awsSessionToken'),
+            awsRegion=data.get('awsRegion'),
         )
 
     @classmethod
@@ -233,6 +263,43 @@ class CommandMessage:
             deviceId=device_id,
             fileName=file_name,
             uploadUrl=upload_url,
+        )
+
+    @classmethod
+    def upload_to_cloud_with_iam(cls, file_name: str, s3_bucket: str, s3_key: str,
+                                 aws_access_key_id: str, aws_secret_access_key: str,
+                                 aws_session_token: str, aws_region: str,
+                                 device_id: str = "controller") -> 'CommandMessage':
+        """
+        Create an UPLOAD_TO_CLOUD command with IAM credentials authentication.
+
+        Uploads the specified file to cloud storage using AWS IAM credentials from STS AssumeRole.
+        File will be automatically deleted from device after successful upload.
+
+        Args:
+            file_name: File name to upload
+            s3_bucket: S3 bucket name
+            s3_key: S3 object key/path
+            aws_access_key_id: AWS access key ID from STS
+            aws_secret_access_key: AWS secret access key from STS
+            aws_session_token: AWS session token from STS
+            aws_region: AWS region (e.g., "us-east-1")
+            device_id: ID of the sending device
+
+        Returns:
+            CommandMessage instance
+        """
+        return cls(
+            command=CommandType.UPLOAD_TO_CLOUD,
+            timestamp=time.time(),
+            deviceId=device_id,
+            fileName=file_name,
+            s3Bucket=s3_bucket,
+            s3Key=s3_key,
+            awsAccessKeyId=aws_access_key_id,
+            awsSecretAccessKey=aws_secret_access_key,
+            awsSessionToken=aws_session_token,
+            awsRegion=aws_region,
         )
 
 
@@ -589,8 +656,8 @@ class UploadItem:
     status: str
     """Upload status (queued, uploading, completed, failed)"""
 
-    uploadUrl: str
-    """Presigned S3 URL for upload"""
+    uploadUrl: Optional[str] = None
+    """Presigned S3 URL for upload (only present when using presigned URL auth)"""
 
     error: Optional[str] = None
     """Error message if upload failed"""
@@ -613,6 +680,6 @@ class UploadItem:
             uploadProgress=data['uploadProgress'],
             uploadSpeed=data['uploadSpeed'],
             status=data['status'],
-            uploadUrl=data['uploadUrl'],
+            uploadUrl=data.get('uploadUrl'),
             error=data.get('error'),
         )
