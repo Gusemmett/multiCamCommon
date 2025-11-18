@@ -24,6 +24,9 @@ public class StatusResponse {
     /** Battery percentage (0.0-100.0), null if unavailable */
     public Double batteryLevel;
 
+    /** Type of device (e.g., "iOS", "Android", "Desktop"), null if unavailable */
+    public String deviceType;
+
     /** Upload queue (includes in-progress and queued uploads) */
     public List<UploadItem> uploadQueue;
 

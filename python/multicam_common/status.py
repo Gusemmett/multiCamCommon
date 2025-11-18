@@ -1,8 +1,26 @@
 """
-Device status enumeration for MultiCam API.
+Device status and type enumerations for MultiCam API.
 """
 
 from enum import Enum
+
+
+class DeviceType(str, Enum):
+    """
+    Device type values used in API responses.
+    """
+
+    IOS_IPHONE = "iOS:iPhone"
+    """iOS device (iPhone)"""
+
+    ANDROID_PHONE = "Android:Phone"
+    """Android phone device"""
+
+    ANDROID_QUEST = "Android:Quest"
+    """Android Quest VR headset"""
+
+    OAK = "Oak"
+    """OAK camera device"""
 
 
 class DeviceStatus(str, Enum):

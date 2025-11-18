@@ -321,6 +321,9 @@ class StatusResponse:
     batteryLevel: Optional[float] = None
     """Battery percentage (0.0-100.0), null if unavailable"""
 
+    deviceType: Optional[str] = None
+    """Type of device (e.g., "iOS", "Android", "Desktop"), null if unavailable"""
+
     uploadQueue: List['UploadItem'] = field(default_factory=list)
     """Upload queue (includes in-progress and queued uploads)"""
 
@@ -347,6 +350,7 @@ class StatusResponse:
             status=data['status'],
             timestamp=data['timestamp'],
             batteryLevel=data.get('batteryLevel'),
+            deviceType=data.get('deviceType'),
             uploadQueue=upload_queue,
             failedUploadQueue=failed_upload_queue,
         )
@@ -363,6 +367,7 @@ class StatusResponse:
             'status': self.status,
             'timestamp': self.timestamp,
             'batteryLevel': self.batteryLevel,
+            'deviceType': self.deviceType,
             'uploadQueue': [asdict(item) for item in self.uploadQueue],
             'failedUploadQueue': [asdict(item) for item in self.failedUploadQueue],
         }

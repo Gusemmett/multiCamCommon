@@ -16,7 +16,7 @@ from .commands import (
     UploadStatus,
     UploadItem,
 )
-from .status import DeviceStatus
+from .status import DeviceStatus, DeviceType
 from .constants import (
     TCP_PORT,
     SERVICE_TYPE,
@@ -44,6 +44,7 @@ __all__ = [
     "UploadItem",
     # Status
     "DeviceStatus",
+    "DeviceType",
     # Constants
     "TCP_PORT",
     "SERVICE_TYPE",

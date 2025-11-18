@@ -379,6 +379,26 @@ components:
           description: File size in bytes (for GET_VIDEO responses)
           example: 52428800
           nullable: true
+        deviceType:
+          type: string
+          description: Type of device (see DeviceType enum for standard values)
+          example: iOS:iPhone
+          nullable: true
+
+    DeviceType:
+      type: string
+      enum:
+        - iOS:iPhone
+        - Android:Phone
+        - Android:Quest
+        - Oak
+      description: |
+        Device type values:
+
+        - `iOS:iPhone`: iOS device (iPhone)
+        - `Android:Phone`: Android phone device
+        - `Android:Quest`: Android Quest VR headset
+        - `Oak`: OAK camera device
 
     DeviceStatus:
       type: string

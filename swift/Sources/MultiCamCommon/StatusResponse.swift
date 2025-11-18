@@ -14,6 +14,9 @@ public struct StatusResponse: Codable {
     /// Battery percentage (0.0-100.0), nil if unavailable
     public let batteryLevel: Double?
 
+    /// Type of device (e.g., "iOS", "Android", "Desktop"), nil if unavailable
+    public let deviceType: String?
+
     /// Upload queue (includes in-progress and queued uploads)
     public let uploadQueue: [UploadItem]
 
@@ -25,6 +28,7 @@ public struct StatusResponse: Codable {
         status: String,
         timestamp: TimeInterval,
         batteryLevel: Double? = nil,
+        deviceType: String? = nil,
         uploadQueue: [UploadItem] = [],
         failedUploadQueue: [UploadItem] = []
     ) {
@@ -32,6 +36,7 @@ public struct StatusResponse: Codable {
         self.status = status
         self.timestamp = timestamp
         self.batteryLevel = batteryLevel
+        self.deviceType = deviceType
         self.uploadQueue = uploadQueue
         self.failedUploadQueue = failedUploadQueue
     }
