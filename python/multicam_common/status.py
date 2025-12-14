@@ -69,6 +69,9 @@ class DeviceStatus(str, Enum):
     UPLOAD_FAILED = "upload_failed"
     """Upload failed (check message field for error)"""
 
+    CAMERA_DISCONNECTED = "camera_disconnected"
+    """OAK camera is not connected via USB"""
+
     @classmethod
     def is_success(cls, status: str) -> bool:
         """
@@ -109,5 +112,6 @@ class DeviceStatus(str, Enum):
             cls.TIME_NOT_SYNCHRONIZED.value,
             cls.FILE_NOT_FOUND.value,
             cls.UPLOAD_FAILED.value,
+            cls.CAMERA_DISCONNECTED.value,
         }
         return status.lower() in error_statuses
